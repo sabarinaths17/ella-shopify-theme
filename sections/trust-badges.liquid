@@ -1,0 +1,195 @@
+{{ 'component-product.css' | asset_url | stylesheet_tag }}
+
+{%- style -%}
+    #shopify-section-{{ section.id }} .trust-badges__list {
+        display: grid;
+        grid-template-columns: repeat({{ section.settings.columns_mobile }}, 1fr);
+        gap: 30px 20px;
+    }
+    @media screen and (min-width: 768px) {
+        #shopify-section-{{ section.id }} .trust-badges__list {
+            grid-template-columns: repeat({{ section.settings.columns_desktop }}, 1fr);
+        }
+    }
+    #shopify-section-{{ section.id }} .trust-badges__list .product-customInformation {
+        text-align: center;
+        align-items: center;
+    }
+    #shopify-section-{{ section.id }} .trust-badges__list .product-customInformation__icon {
+        margin: 0 auto 12px;
+    }
+    #shopify-section-{{ section.id }} {
+        padding-top: {{ section.settings.mg_top_desktop }}px;
+        padding-bottom: {{ section.settings.mg_bottom_desktop }}px;
+    }
+{%- endstyle -%}
+
+<div class="{% if section.settings.container == 'default' %}container{% else %}container-fluid{% endif %}">
+    {%- if section.settings.heading != blank -%}
+        <h2 class="trust-badges__heading text-center">{{ section.settings.heading }}</h2>
+    {%- endif -%}
+
+    {%- if section.blocks.size > 0 -%}
+        <div class="trust-badges__list">
+            {%- for block in section.blocks -%}
+                {%- if block.type == 'badge' -%}
+                    {% render 'product-custom-information', block: block %}
+                {%- endif -%}
+            {%- endfor -%}
+        </div>
+    {%- endif -%}
+</div>
+
+{% schema %}
+{
+  "name": "Trust badges",
+  "tag": "section",
+  "class": "section trust-badges-section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Why shop with us"
+    },
+    {
+      "type": "select",
+      "id": "container",
+      "label": "Container",
+      "default": "default",
+      "options": [
+        { "value": "default", "label": "Default" },
+        { "value": "fluid", "label": "Full width" }
+      ]
+    },
+    {
+      "type": "range",
+      "id": "columns_desktop",
+      "label": "Columns (desktop)",
+      "min": 2,
+      "max": 4,
+      "step": 1,
+      "default": 4
+    },
+    {
+      "type": "range",
+      "id": "columns_mobile",
+      "label": "Columns (mobile)",
+      "min": 1,
+      "max": 4,
+      "step": 1,
+      "default": 2
+    },
+    {
+      "type": "range",
+      "id": "mg_top_desktop",
+      "label": "Top spacing",
+      "min": 0,
+      "max": 100,
+      "step": 2,
+      "unit": "px",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "mg_bottom_desktop",
+      "label": "Bottom spacing",
+      "min": 0,
+      "max": 100,
+      "step": 2,
+      "unit": "px",
+      "default": 40
+    }
+  ],
+  "blocks": [
+    {
+      "type": "badge",
+      "name": "Badge",
+      "settings": [
+        {
+          "type": "liquid",
+          "id": "icon",
+          "label": "Icon (inline SVG)"
+        },
+        {
+          "type": "color",
+          "id": "color_icon",
+          "label": "Icon color",
+          "default": "#232323"
+        },
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Heading"
+        },
+        {
+          "type": "color",
+          "id": "color_title",
+          "label": "Heading color",
+          "default": "#232323"
+        },
+        {
+          "type": "liquid",
+          "id": "text_description",
+          "label": "Supporting text"
+        },
+        {
+          "type": "color",
+          "id": "color_des",
+          "label": "Supporting text color",
+          "default": "#999999"
+        },
+        {
+          "type": "range",
+          "id": "fontsize_text",
+          "label": "Heading font size",
+          "min": 8,
+          "max": 30,
+          "step": 1,
+          "unit": "px",
+          "default": 16
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Trust badges",
+      "blocks": [
+        {
+          "type": "badge",
+          "settings": {
+            "icon": "<svg class=\"icon-shipping-truck\" viewBox=\"0 0 40.55 24\"><g id=\"Layer_2\" data-name=\"Layer 2\"><g id=\"Layer_1-2\" data-name=\"Layer 1\"><path class=\"truck-body\" d=\"M40.43,11a3.86,3.86,0,0,0-3.68-2.65H28a1.25,1.25,0,0,1-1.43-1.43c0-2.18,0-4.35,0-6.53,0-.31-.08-.36-.37-.36H5.11a1.18,1.18,0,0,0-1.3,1.32c0,.74,0,1.48,0,2.22,0,.21-.06.27-.26.26-.36,0-.71,0-1.07,0a1.19,1.19,0,1,0,0,2.37H7.19c.43,0,.85,0,1.27,0a1,1,0,0,1,1.07,1A1.19,1.19,0,0,1,8.24,8.48H1.35a1.83,1.83,0,0,0-.47,0A1.19,1.19,0,0,0,0,9.85a1.18,1.18,0,0,0,1.19,1h9.66c.34,0,.68,0,1,0A1.19,1.19,0,0,1,13,12.47a1.26,1.26,0,0,1-1.26.76H1.24a1.19,1.19,0,1,0,0,2.38c.76,0,1.51,0,2.26,0,.26,0,.33.07.32.32,0,1,0,2.09,0,3.13A1.18,1.18,0,0,0,5.1,20.36c.63,0,1.26,0,1.9,0,.27,0,.39.06.47.36a4.55,4.55,0,0,0,8.78-.11.29.29,0,0,1,.32-.25H28.09a.3.3,0,0,1,.34.27,4.55,4.55,0,0,0,8.8,0,.31.31,0,0,1,.35-.26c.49,0,1,0,1.47,0a1.37,1.37,0,0,0,1.5-.87V11.41C40.41,11.29,40.47,11.12,40.43,11ZM32.84,21.62A2.18,2.18,0,1,1,35,19.45,2.21,2.21,0,0,1,32.84,21.62Zm-21,0A2.18,2.18,0,1,1,14,19.45,2.2,2.2,0,0,1,11.86,21.62Z\"/><path class=\"truck-body\" d=\"M29.27,6h5.85c.1,0,.2,0,.29,0C33.64,2.72,32,.91,28.91.26V.57c0,1.68,0,3.35,0,5C28.9,5.9,29,6,29.27,6Z\"/><path class=\"wheel\" d=\"M11.87,17.27A2.18,2.18,0,1,0,14,19.45,2.2,2.2,0,0,0,11.87,17.27Z\"/><path class=\"wheel\" d=\"M32.85,17.27A2.18,2.18,0,1,0,35,19.45,2.22,2.22,0,0,0,32.85,17.27Z\"/></g></g></svg>",
+            "text": "Free delivery",
+            "text_description": "On orders above AED 99"
+          }
+        },
+        {
+          "type": "badge",
+          "settings": {
+            "icon": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 512 512\"><path d=\"M48.5 224H40c-13.3 0-24-10.7-24-24V72c0-9.7 5.8-18.5 14.8-22.2s19.3-1.5 26.2 5.3L98.6 96.6c87.6-86.5 228.7-86.2 315.8 1c87.5 87.5 87.5 229.3 0 316.8s-229.3 87.5-316.8 0c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0c62.5 62.5 163.8 62.5 226.3 0s62.5-163.8 0-226.3c-62.2-62.2-162.7-62.5-225.3-1L184 184c6.9 6.9 8.9 17.2 5.3 26.2s-12.5 14.8-22.2 14.8H48.5z\"/></svg>",
+            "text": "Easy returns",
+            "text_description": "14-day return policy"
+          }
+        },
+        {
+          "type": "badge",
+          "settings": {
+            "icon": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 448 512\"><path d=\"M48 32H197.5C214.5 32 230.7 38.74 242.7 50.75L418.7 226.7C443.7 251.7 443.7 292.3 418.7 317.3L285.3 450.7C260.3 475.7 219.7 475.7 194.7 450.7L18.75 274.7C6.743 262.7 0 246.5 0 229.5V80C0 53.49 21.49 32 48 32L48 32zM112 176C129.7 176 144 161.7 144 144C144 126.3 129.7 112 112 112C94.33 112 80 126.3 80 144C80 161.7 94.33 176 112 176z\"/></svg>",
+            "text": "Wholesale pricing",
+            "text_description": "Register a business account"
+          }
+        },
+        {
+          "type": "badge",
+          "settings": {
+            "icon": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 512 512\"><path d=\"M256 32C114.6 32 0 125.1 0 240c0 47.6 19.9 91.2 52.9 126.3C38 405.7 7 439.1 6.5 439.5c-6.6 7-8.4 17.2-4.6 26S14.4 480 24 480c61.5 0 110-29.6 139.1-51.3C192 439.8 223.2 448 256 448c141.4 0 256-93.1 256-208S397.4 32 256 32z\"/></svg>",
+            "text": "Expert consultation",
+            "text_description": "Talk to our product specialists"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,147 @@
+{%- comment -%}
+    Product card 09 - CRO redesign spec: large image, floating action icons
+    (wishlist/quick-view/cart/compare), inline qty stepper that toggles with
+    the Add to Cart button, SKU, price, variant dropdown, "more sizes" helper.
+
+    Accepts the same params as snippets/product-card.liquid (rendered via the
+    same 'product-grid-layout' dispatcher with settings.product_card_layout == '09').
+{%- endcomment -%}
+{{ 'component-card-09.css' | asset_url | stylesheet_tag }}
+
+{%- liquid
+    assign current_variant = product_card_product.selected_or_first_available_variant
+    assign has_video = product_card_product.media | where: 'media_type', 'video'
+
+    assign show_quick_view = false
+    if settings.show_quick_view
+        assign show_quick_view = true
+    endif
+
+    assign show_wishlist = false
+    if settings.show_wishlist_card and settings.show_wishlist
+        assign show_wishlist = true
+    elsif template.suffix == 'ajax_wishlist_card'
+        assign show_wishlist = true
+    endif
+
+    assign variant_size = product_card_product.options_by_name['Size'].values | size
+-%}
+
+<div
+    class="product-item product-item-09"
+    data-product-id="{{ product_card_product.id }}"
+    data-json-product='{"id": {{ product_card_product.id }},"handle": "{{ product_card_product.handle }}","variants": {{ product_card_product.variants | json | escape }}}'
+>
+    <div class="card card-09">
+        <div class="card-product{% if product_card_product.featured_media == nil %} card--text-only card--soft{% endif %}">
+            <div class="card-product__wrapper">
+                {%- if settings.show_badge -%}
+                    {% render 'product-badge', product: product_card_product, class: 'card__badge', badge_detail: true, serial: serial %}
+                {%- endif -%}
+
+                <div
+                    class="card-media card-media--{{ media_size }}{% if product_card_product.media[1] != nil and settings.show_image_swap %} media--hover-effect{% endif %}"
+                    {% if product_card_product.featured_media %} style="padding-bottom: 100%;"{% endif %}
+                >
+                    {% render 'image-product-card', product_card_product: product_card_product, variant_img: '', has_video: has_video, loading: loading %}
+                    <a class="card-link" href="{{ product_card_product.url }}" title="{{ product_card_product.title | escape }}"></a>
+                </div>
+
+                <div class="card-09__actions group-09">
+                    {%- if show_wishlist -%}
+                        <div class="card-09__action-item">
+                            <button type="button" title="{{ 'wishlist.general.add' | t }}" class="wishlist-icon" data-wishlist data-wishlist-handle="{{ product_card_product.handle }}" data-product-id="{{ product_card_product.id }}">
+                                <span class="text">{{ 'wishlist.general.add' | t }}</span>
+                                {% render 'icon-heart-2' %}
+                            </button>
+                        </div>
+                    {%- endif -%}
+                    {%- if show_quick_view -%}
+                        <div class="card-09__action-item">
+                            <button type="button" title="{{ 'products.product.quick_view' | t }}" class="quickview-icon" data-product-id="{{ product_card_product.id }}" data-open-quick-view-popup data-product-handle="{{ product_card_product.handle }}">
+                                <span class="text">{{ 'products.product.quick_view' | t }}</span>
+                                {% render 'icon-eyes' %}
+                            </button>
+                        </div>
+                    {%- endif -%}
+                    <div class="card-09__action-item">
+                        <button type="button" title="{{ 'products.product.add_to_cart' | t }}" class="quick-cart-icon" data-card-quick-add aria-label="{{ 'products.product.add_to_cart' | t }}">
+                            <span class="text">{{ 'products.product.add_to_cart' | t }}</span>
+                            {% render 'icon-cart' %}
+                        </button>
+                    </div>
+                    <div
+                        class="card-09__action-item card-09__compare"
+                        data-product-compare
+                        data-product-compare-handle="{{ product_card_product.handle }}"
+                        data-product-compare-id="{{ product_card_product.id }}"
+                    >
+                        <input
+                            id="compare-{{ product_card_product.id }}-{{ sectionId }}"
+                            class="card-09__compare-checkbox"
+                            type="checkbox"
+                            name="compare"
+                            value="{{ product_card_product.handle }}"
+                        >
+                        <label class="card-09__compare-label" for="compare-{{ product_card_product.id }}-{{ sectionId }}" title="{{ 'compare.general.title' | t }}">
+                            <span class="text">{{ 'compare.general.title' | t }}</span>
+                            {% render 'icon-compare' %}
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <product-card-quantity
+            class="card-09__quantity"
+            data-product-id="{{ product_card_product.id }}"
+            data-variant-id="{{ current_variant.id }}"
+        >
+            <div class="card-09__stepper" hidden>
+                <button type="button" class="card-09__qty-minus" data-qty-minus aria-label="Decrease quantity">&#8722;</button>
+                <span class="card-09__qty-value" data-qty-value>1</span>
+                <button type="button" class="card-09__qty-plus" data-qty-plus aria-label="Increase quantity">&#43;</button>
+            </div>
+        </product-card-quantity>
+
+        <div class="card-information card-information-09">
+            <h3 class="card__heading">
+                <a class="card-title link-underline" href="{{ product_card_product.url }}">{{ product_card_product.title | escape }}</a>
+            </h3>
+
+            {%- if current_variant.sku != blank -%}
+                <div class="card-09__sku" data-card-sku>
+                    <span class="card-09__sku-label">{{ 'products.product.text.sku' | t }}</span>
+                    <span class="card-09__sku-value">{{ current_variant.sku }}</span>
+                </div>
+            {%- else -%}
+                <div class="card-09__sku" data-card-sku hidden>
+                    <span class="card-09__sku-label">{{ 'products.product.text.sku' | t }}</span>
+                    <span class="card-09__sku-value"></span>
+                </div>
+            {%- endif -%}
+
+            <div class="card-price card-09__price" data-card-price>
+                {% render 'price', product: product_card_product, price_class: '' %}
+            </div>
+
+            <div class="card-09__variant-select-wrapper">
+                {%- if product_card_product.variants.size > 1 -%}
+                    <select class="card-09__variant-select" data-variant-select aria-label="Select variant">
+                        {%- for variant in product_card_product.variants -%}
+                            <option value="{{ variant.id }}"{% if variant.id == current_variant.id %} selected{% endif %}{% unless variant.available %} disabled{% endunless %}>
+                                {{ variant.title }}{% unless variant.available %} - {{ 'products.product.sold_out' | t }}{% endunless %}
+                            </option>
+                        {%- endfor -%}
+                    </select>
+                {%- endif -%}
+            </div>
+
+            <div class="card-09__more-sizes-wrapper">
+                {%- if variant_size > 0 -%}
+                    <span class="card-09__more-sizes">{{ 'products.product.more_sizes' | t }}</span>
+                {%- endif -%}
+            </div>
+        </div>
+    </div>
+</div>
